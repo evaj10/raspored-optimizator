@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<solver xmlns="https://www.optaplanner.org/xsd/solver" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.optaplanner.org/xsd/solver https://www.optaplanner.org/xsd/solver/solver.xsd">
+
+    <!--  Multithreading config  -->
+    <moveThreadCount>AUTO</moveThreadCount>
+
+    <solutionClass>org.acme.schooltimetabling.domain.MeetingSchedule</solutionClass>
+    <entityClass>org.acme.schooltimetabling.domain.MeetingAssignment</entityClass>
+
+    <scoreDirectorFactory>
+        <constraintProviderClass>org.acme.schooltimetabling.solver.TimeTableConstraintProvider</constraintProviderClass>
+    </scoreDirectorFactory>
+
+    <constructionHeuristic>
+        <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
+        <!-- ubrzana konstrukciona heuristika (ne radi se dekartov proizvod vec sekvencijalna selekcija) -->
+        <changeMoveSelector>
+            <valueSelector variableName="prostorija"/>
+        </changeMoveSelector>
+        <changeMoveSelector>
+            <valueSelector variableName="startingTimeGrain"/>
+        </changeMoveSelector>
+    </constructionHeuristic>
+
+    <localSearch>
+        <termination>
+<!--            <unimprovedSpentLimit>PT2M30S</unimprovedSpentLimit>-->
+            <unimprovedSpentLimit>PT1H</unimprovedSpentLimit>
+        </termination>
+        <localSearchType>LATE_ACCEPTANCE</localSearchType>
+<!--        <localSearchType>TABU_SEARCH</localSearchType>-->
+    </localSearch>
+<!--    <localSearch>-->
+<!--        <termination>-->
+<!--            <unimprovedSpentLimit>PT2M30S</unimprovedSpentLimit>-->
+<!--            <bestScoreFeasible>true</bestScoreFeasible>-->
+<!--        </termination>-->
+<!--        <localSearchType>TABU_SEARCH</localSearchType>-->
+<!--    </localSearch>-->
+</solver>
