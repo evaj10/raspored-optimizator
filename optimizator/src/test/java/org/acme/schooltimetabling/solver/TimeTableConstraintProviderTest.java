@@ -40,7 +40,8 @@ class TimeTableConstraintProviderTest {
     private static final TimeGrain GRAIN12 = new TimeGrain(11, 11*60+45, DAN_2);
     private static final TimeGrain GRAIN_WEN_9 = new TimeGrain(20, 9*60, DAN_3);
     private static final TimeGrain GRAIN_WEN_15 = new TimeGrain(22, 15*60, DAN_3);
-    private static final TimeGrain GRAIN_LATE = new TimeGrain(22, 19*60+45, DAN_3);
+    private static final TimeGrain GRAIN_LATE = new TimeGrain(23, 19*60+45, DAN_3);
+    private static final TimeGrain GRAIN_EARLY = new TimeGrain(24, 7*60, DAN_3);
 //    private static final TimeGrain GRAIN12 = new TimeGrain(12L, 11, DAY2, 11*60+45);
 //    private static final TimeGrain GRAIN13 = new TimeGrain(13L, 12, DAY2, 12*60);
 //    private static final TimeGrain GRAIN14 = new TimeGrain(14L, 13, DAY2, 12*60+15);
@@ -413,19 +414,37 @@ class TimeTableConstraintProviderTest {
     }
 
     @Test
-    void limitWorkingHoursSatisfied() {
+    void limitWorkingHoursEndSatisfied() {
         MeetingAssignment firstMeeting = new MeetingAssignment(MEETING1, GRAIN2, PROSTORIJA_1);
-        constraintVerifier.verifyThat(TimeTableConstraintProvider::limitWorkingHours)
+        constraintVerifier.verifyThat(TimeTableConstraintProvider::limitWorkingHoursEnd)
                 .given(firstMeeting)
                 .penalizesBy(0);
     }
 
     @Test
-    void limitWorkingHoursNotSatisfied() {
+    void limitWorkingHoursEndNotSatisfied() {
+        // pocetak: 19:45, trajanje: 1:30 => kraj: 21:15 => prekoracenje = 75
         MeetingAssignment firstMeeting = new MeetingAssignment(MEETING1, GRAIN_LATE, PROSTORIJA_1);
-        constraintVerifier.verifyThat(TimeTableConstraintProvider::limitWorkingHours)
+        constraintVerifier.verifyThat(TimeTableConstraintProvider::limitWorkingHoursEnd)
                 .given(firstMeeting)
-                .penalizesBy(100);
+                .penalizesBy(75 * 50);
+    }
+
+    @Test
+    void limitWorkingHoursStartSatisfied() {
+        MeetingAssignment firstMeeting = new MeetingAssignment(MEETING1, GRAIN2, PROSTORIJA_1);
+        constraintVerifier.verifyThat(TimeTableConstraintProvider::limitWorkingHoursStart)
+                .given(firstMeeting)
+                .penalizesBy(0);
+    }
+
+    @Test
+    void limitWorkingHoursStartNotSatisfied() {
+        // pocetak: 07:00 => prekoracenje = 60
+        MeetingAssignment firstMeeting = new MeetingAssignment(MEETING1, GRAIN_EARLY, PROSTORIJA_1);
+        constraintVerifier.verifyThat(TimeTableConstraintProvider::limitWorkingHoursStart)
+                .given(firstMeeting)
+                .penalizesBy(60 * 50);
     }
 
     @Test

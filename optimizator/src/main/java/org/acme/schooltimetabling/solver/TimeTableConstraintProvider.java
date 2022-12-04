@@ -29,7 +29,8 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                 teacherRoomLink(constraintFactory),
 
                 // Medium constraints
-                limitWorkingHours(constraintFactory),
+                limitWorkingHoursEnd(constraintFactory),
+                limitWorkingHoursStart(constraintFactory),
                 limitRoomCapacityOverflow(constraintFactory),
                 generalRoom(constraintFactory),
                 teacherLimitWorkingDays(constraintFactory),
@@ -249,15 +250,26 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                 });
     }
 
-    protected Constraint limitWorkingHours(ConstraintFactory constraintFactory) {
+    protected Constraint limitWorkingHoursEnd(ConstraintFactory constraintFactory) {
         return constraintFactory
                 // za svaki miting asajnment
                 .forEach(MeetingAssignment.class)
                 // ako se zavrsava nakon 20
                 .filter(meetingAssignment -> meetingAssignment.getEndTime() > 20*60)
-                // MEDIUM * 100
-                .penalize("Daily overtime", HardMediumSoftScore.ONE_MEDIUM,
-                        (meetingAssignment) -> 100);
+                // MEDIUM * prekoracenje_u_minutima * 50
+                .penalize("End hours overtime", HardMediumSoftScore.ONE_MEDIUM,
+                        (meetingAssignment) -> (meetingAssignment.getEndTime() - 20*60) * 50);
+    }
+
+    protected Constraint limitWorkingHoursStart(ConstraintFactory constraintFactory) {
+        return constraintFactory
+                // za svaki miting asajnment
+                .forEach(MeetingAssignment.class)
+                // ako pocinje pre 8
+                .filter(meetingAssignment -> meetingAssignment.getStartTime() < 8*60)
+                // MEDIUM * prekoracenje_u_minutima * 50
+                .penalize("Start hours overtime", HardMediumSoftScore.ONE_MEDIUM,
+                        (meetingAssignment) -> (8*60 - meetingAssignment.getStartTime()) * 50);
     }
 
     protected Constraint generalRoom(ConstraintFactory constraintFactory) {

@@ -28,11 +28,40 @@ public class TimeTableController {
     @Autowired
     private ScoreManager<MeetingSchedule, HardMediumSoftScore> scoreManager;
 
+    @PostMapping
+    public void createMeetingSchedule(@RequestBody MeetingSchedule ms) {
+        System.out.println("Created MeetingSchedule");
+        MeetingAssignment meetingAssignment = ms.getMeetingAssignmentList().get(0);
+        meetingAssignment.setStartingTimeGrain(ms.getTimeGrainList().get(0));
+        meetingAssignment.setProstorija(ms.getProstorijaList().get(0));
+
+        ms.setId(TimeTableState.MEETING_SCHEDULE_ID);
+        state.setTimeTableState(ms);
+    }
+
     @GetMapping
     public List<MeetingAssignment> getTimeTable() {
         MeetingSchedule solution = state.getTimeTableState(TimeTableState.MEETING_SCHEDULE_ID);
         return solution.getMeetingAssignmentList();
     }
+
+    @PostMapping("/solve")
+    public void solve() {
+        solverManager.solveAndListen(
+                TimeTableState.MEETING_SCHEDULE_ID,
+                state::getTimeTableState,
+                // called when new best solution found ends
+                state::bestSolutionLogger,
+                // called when solving ends
+                state::setTimeTableState,
+                null);
+    }
+
+    @PostMapping("/stopSolving")
+    public void stopSolving() {
+        solverManager.terminateEarly(TimeTableState.MEETING_SCHEDULE_ID);
+    }
+
 
     @GetMapping("/score")
     public String getScore() {
@@ -42,7 +71,6 @@ public class TimeTableController {
 
     @GetMapping("/broken-rules")
     public String getScoreExplanation() {
-        SolverStatus solverStatus = getSolverStatus();
         MeetingSchedule solution = state.getTimeTableState(TimeTableState.MEETING_SCHEDULE_ID);
         scoreManager.updateScore(solution); // Sets the score
 
@@ -64,36 +92,6 @@ public class TimeTableController {
             output.append("\n\n");
         }
         return output.toString();
-    }
-
-    @PostMapping("/solve")
-    public void solve() {
-        solverManager.solve(
-                TimeTableState.MEETING_SCHEDULE_ID,
-                state.getTimeTableState(TimeTableState.MEETING_SCHEDULE_ID),
-                // called when solving ends
-                state::setTimeTableState);
-//        solverManager.solveAndListen(1L, state::getTimeTableState, state::updateTimeTableState);
-    }
-
-    public SolverStatus getSolverStatus() {
-        return solverManager.getSolverStatus(TimeTableState.MEETING_SCHEDULE_ID);
-    }
-
-    @PostMapping("/stopSolving")
-    public void stopSolving() {
-        solverManager.terminateEarly(TimeTableState.MEETING_SCHEDULE_ID);
-    }
-
-    @PostMapping
-    public void createMeetingSchedule(@RequestBody MeetingSchedule ms) {
-        System.out.println("Created MeetingSchedule");
-        MeetingAssignment meetingAssignment = ms.getMeetingAssignmentList().get(0);
-        meetingAssignment.setStartingTimeGrain(ms.getTimeGrainList().get(0));
-        meetingAssignment.setProstorija(ms.getProstorijaList().get(0));
-
-        ms.setId(TimeTableState.MEETING_SCHEDULE_ID);
-        state.setTimeTableState(ms);
     }
 
 }

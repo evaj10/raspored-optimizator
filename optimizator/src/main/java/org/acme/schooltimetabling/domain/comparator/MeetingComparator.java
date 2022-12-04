@@ -9,7 +9,7 @@ public class MeetingComparator implements Comparator<Meeting>, Comparable<Meetin
     @Override
     public int compare(Meeting m1, Meeting m2) {
         return Comparator
-				// TODO: da li bi bilo dobro prvo dodeliti sva predavanja pa sve vezbe?
+                // TODO: potencijalno bi bilo dobro prvo dodeliti predavanja ili vezbe?
                 .comparing(Meeting::getRequiredCapacity)
                 .thenComparing(Meeting::getDurationInGrains)
                 .compare(m1, m2);

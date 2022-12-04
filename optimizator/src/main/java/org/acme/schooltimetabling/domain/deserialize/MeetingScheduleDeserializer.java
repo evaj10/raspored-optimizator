@@ -171,6 +171,10 @@ public class MeetingScheduleDeserializer extends StdDeserializer<MeetingSchedule
             int brojCasova = meetingNode.get("brojCasova").asInt();
             UUID predavacId = UUID.fromString(meetingNode.get("predavac").asText());
             Predavac predavac = predavacMap.get(predavacId);
+            // check
+            if (predavac == null) {
+                System.out.println("Meeting with invalid predavac: " + id);
+            }
 
             // ostaliPredavaci -> [""] ili lista ["guid", "guid"]
             List<Predavac> ostaliPredavaci = new ArrayList<>();
@@ -179,11 +183,22 @@ public class MeetingScheduleDeserializer extends StdDeserializer<MeetingSchedule
                 JsonNode ostaliPredavacNode = j.next();
                 if (!ostaliPredavacNode.asText().equals("")) {
                     UUID ostaliPredavacId = UUID.fromString(ostaliPredavacNode.asText());
+                    // check
+                    Predavac ostao = predavacMap.get(ostaliPredavacId);
+                    if (ostao == null) {
+                        System.out.println("Meeting with invalid ostali predavac: " + id);
+                        System.out.println("Id ostalog predavaca: " + ostaliPredavacId);
+                    }
                     ostaliPredavaci.add(predavacMap.get(ostaliPredavacId));
                 }
             }
             UUID predmetId = UUID.fromString(meetingNode.get("predmet").asText());
             Predmet predmet = predmetMap.get(predmetId);
+            // check
+            if (predmet == null) {
+                System.out.println("Meeting with invalid predmet: " + id);
+            }
+
             // studGrupe -> guid ili lista
             List<StudentskaGrupa> studGrupeList = new ArrayList<>();
             if (meetingNode.get("studentskeGrupe").isArray()) {
@@ -191,10 +206,22 @@ public class MeetingScheduleDeserializer extends StdDeserializer<MeetingSchedule
                 for (Iterator<JsonNode> j = studGrupeArrayNode.elements(); j.hasNext();) {
                     JsonNode studGrupaNode = j.next();
                     UUID studGrupaId = UUID.fromString(studGrupaNode.asText());
+                    // check
+                    StudentskaGrupa grupa = studentskaGrupaMap.get(studGrupaId);
+                    if (grupa == null) {
+                        System.out.println("Meeting with invalid stud grupa: " + id);
+                        System.out.println("Invalid stud grupa: " + studGrupaId);
+                    }
                     studGrupeList.add(studentskaGrupaMap.get(studGrupaId));
                 }
             } else {
                 UUID studGrupaId = UUID.fromString(meetingNode.get("studentskeGrupe").asText());
+                // check
+                StudentskaGrupa grupa = studentskaGrupaMap.get(studGrupaId);
+                if (grupa == null) {
+                    System.out.println("Meeting with invalid stud grupa: " + id);
+                    System.out.println("Invalid stud grupa: " + studGrupaId);
+                }
                 studGrupeList.add(studentskaGrupaMap.get(studGrupaId));
             }
             boolean biWeekly = meetingNode.get("biWeekly").asBoolean();
@@ -205,8 +232,9 @@ public class MeetingScheduleDeserializer extends StdDeserializer<MeetingSchedule
 
         // meeting assignment list -> when some entities are already planned, just add them to the list
         List<MeetingAssignment> meetingAssignmentList = new ArrayList<>();
-        ArrayNode meetingAssignmentArrayNode = (ArrayNode) node.get("meetingAssignmentList");
-        if (meetingAssignmentArrayNode != null) {
+        JsonNode meetingAssignmentListNode = node.get("meetingAssignmentList");
+        if (!meetingAssignmentListNode.isNull()) {
+            ArrayNode meetingAssignmentArrayNode = (ArrayNode) node.get("meetingAssignmentList");
             for (Iterator<JsonNode> i = meetingAssignmentArrayNode.elements(); i.hasNext(); ) {
                 JsonNode meetingAssignmentNode = i.next();
                 // MeetingAssignment id

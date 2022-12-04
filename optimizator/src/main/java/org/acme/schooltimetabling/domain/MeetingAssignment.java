@@ -1,5 +1,6 @@
 package org.acme.schooltimetabling.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,8 +31,6 @@ public class MeetingAssignment {
     @PlanningVariable(valueRangeProviderRefs = { "roomRange" })
     private Prostorija prostorija;
 
-    // TODO: make nullable to fight overconstrained problem (add medium constraint to punish)
-    // -> might migrate to bendable score type to define multiple levels (groups) of importance
     @PlanningVariable(valueRangeProviderRefs = { "timeGrainRange" })
     private TimeGrain startingTimeGrain;
 
@@ -101,6 +100,7 @@ public class MeetingAssignment {
         }
     }
 
+    @JsonIgnore
     public Integer getLastTimeGrainIndex() {
         if (startingTimeGrain == null) {
             return null;
@@ -108,6 +108,15 @@ public class MeetingAssignment {
         return startingTimeGrain.getGrainIndex() + meeting.getDurationInGrains() - 1;
     }
 
+    @JsonIgnore
+    public Integer getStartTime() {
+        if (startingTimeGrain == null) {
+            return null;
+        }
+        return startingTimeGrain.getPocetniMinut();
+    }
+
+    @JsonIgnore
     public Integer getEndTime() {
         if (startingTimeGrain == null) {
             return null;
@@ -115,6 +124,7 @@ public class MeetingAssignment {
         return startingTimeGrain.getPocetniMinut() + (meeting.getDurationInGrains() - 1) * TimeGrain.GRAIN_LENGTH_IN_MINUTES;
     }
 
+    @JsonIgnore
     public Integer getEndTimeGrainIndex() {
         if (startingTimeGrain == null) {
             return null;
@@ -122,14 +132,17 @@ public class MeetingAssignment {
         return startingTimeGrain.getGrainIndex() + meeting.getDurationInGrains();
     }
 
+    @JsonIgnore
     public Predavac getTeacher() {
         return meeting.getPredavac();
     }
 
+    @JsonIgnore
     public String getStartTimeString() {
         return startingTimeGrain.getTimeString();
     }
 
+    @JsonIgnore
     public String getEndTimeString() {
         return TimeGrain.getTimeString(this.getEndTime());
     }
@@ -140,6 +153,7 @@ public class MeetingAssignment {
         return meetingEnd >= startMinute && meetingStart <= endMinute;
     }
 
+    @JsonIgnore
     public int getRoomCapacity() {
         if (prostorija == null) {
             return 0;
@@ -147,10 +161,12 @@ public class MeetingAssignment {
         return prostorija.getKapacitet();
     }
 
+    @JsonIgnore
     public int getRequiredCapacity() {
         return meeting.getRequiredCapacity();
     }
 
+    @JsonIgnore
     public TipProstorije getRoomType() {
         if (prostorija == null) {
             return null;
@@ -158,6 +174,7 @@ public class MeetingAssignment {
         return prostorija.getTip();
     }
 
+    @JsonIgnore
     public TipProstorije getRequiredRoomType() {
         return meeting.getTipProstorije();
     }
