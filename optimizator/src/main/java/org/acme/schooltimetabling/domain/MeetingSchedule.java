@@ -11,7 +11,7 @@ import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
-import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore;
+import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScore;
 
 import java.util.List;
 
@@ -57,8 +57,8 @@ public class MeetingSchedule {
 
     private Semestar semestar;
 
-    @PlanningScore
-    private HardMediumSoftScore score;
+    @PlanningScore(bendableHardLevelsSize = 1, bendableSoftLevelsSize = 4)
+    private BendableLongScore score;
 
     public MeetingSchedule(List<Meeting> meetingList, List<Dan> danList, List<TimeGrain> timeGrainList,
                            List<Prostorija> prostorijaList, List<Predavac> predavacList, List<StudentskaGrupa> studentskaGrupaList,
