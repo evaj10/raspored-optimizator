@@ -29,6 +29,8 @@ public class TimeTableController {
 
     @PostMapping
     public void createMeetingSchedule(@RequestBody MeetingSchedule ms) {
+        ms.setupProstorije();
+        ms.constructMeetingAssignmentList();
         System.out.println("Created MeetingSchedule");
         MeetingAssignment meetingAssignment = ms.getMeetingAssignmentList().get(0);
         meetingAssignment.setStartingTimeGrain(ms.getTimeGrainList().get(0));

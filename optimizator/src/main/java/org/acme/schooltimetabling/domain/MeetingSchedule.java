@@ -1,10 +1,8 @@
 package org.acme.schooltimetabling.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.acme.schooltimetabling.domain.deserialize.MeetingScheduleDeserializer;
 import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
@@ -13,13 +11,15 @@ import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.bendablelong.BendableLongScore;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Getter
 @Setter
 
-@JsonDeserialize(using = MeetingScheduleDeserializer.class)
+//@JsonDeserialize(using = MeetingScheduleDeserializer.class)
 @PlanningSolution
 public class MeetingSchedule {
 
@@ -91,6 +91,24 @@ public class MeetingSchedule {
                            List<MeetingAssignment> meetingAssignmentList, Semestar semestar) {
         this(studProgramList, meetingList, danList, timeGrainList, prostorijaList, predavacList, studentskaGrupaList, meetingAssignmentList, semestar);
         this.id = id;
+    }
+
+    public void setupProstorije() {
+        this.prostorijaList.forEach(Prostorija::fillProsireneOrgJedinice);
+    }
+
+    public void constructMeetingAssignmentList() {
+        if (this.meetingAssignmentList == null) {
+            this.meetingAssignmentList = new ArrayList<>();
+        }
+        if (!this.meetingAssignmentList.isEmpty()) {
+            // find all meetings that have already been assigned (ex. OAS)
+            List<Meeting> assignedMeetings = this.meetingAssignmentList.stream().map(MeetingAssignment::getMeeting).collect(Collectors.toList());
+            // remove all from meeting list
+            this.meetingList.removeAll(assignedMeetings);
+        }
+        // create meeting assignments for remaining meetings
+        this.meetingAssignmentList.addAll(this.meetingList.stream().map(MeetingAssignment::new).collect(Collectors.toList()));
     }
 
     //    public MeetingConstraintConfiguration getConstraintConfiguration() {

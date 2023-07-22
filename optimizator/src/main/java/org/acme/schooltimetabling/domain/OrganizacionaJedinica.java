@@ -1,8 +1,10 @@
 package org.acme.schooltimetabling.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.acme.schooltimetabling.domain.deserialize.OrgJedinicaDeserializer;
 import org.optaplanner.core.api.domain.lookup.PlanningId;
 
 import java.util.Objects;
@@ -11,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonDeserialize(using = OrgJedinicaDeserializer.class)
 public abstract class OrganizacionaJedinica {
 
     @PlanningId
@@ -46,5 +49,4 @@ public abstract class OrganizacionaJedinica {
         OrganizacionaJedinica orgJed = (OrganizacionaJedinica) o;
         return id.equals(orgJed.id);
     }
-
 }

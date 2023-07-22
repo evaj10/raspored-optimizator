@@ -45,6 +45,21 @@ public class Prostorija {
             this.prosireneOrgJedinice = new ArrayList<>(orgJedinica);;
             for (OrganizacionaJedinica org : orgJedinica) {
                 if (org instanceof Katedra) {
+                    // ako je prostorija katedre, moze i ko je zaposlen na departmanu
+                    this.prosireneOrgJedinice.add(((Katedra) org).getDepartman());
+                } else {
+                    // ako je prostorija departmana, moze bilo ko sa bilo koje katedre
+                    this.prosireneOrgJedinice.addAll(((Departman) org).getKatedre());
+                }
+            }
+        }
+    }
+
+    public void fillProsireneOrgJedinice() {
+        if (this.orgJedinica != null) {
+            this.prosireneOrgJedinice = new ArrayList<>(orgJedinica);;
+            for (OrganizacionaJedinica org : orgJedinica) {
+                if (org instanceof Katedra) {
                     this.prosireneOrgJedinice.add(((Katedra) org).getDepartman());
                 } else {
                     this.prosireneOrgJedinice.addAll(((Departman) org).getKatedre());
