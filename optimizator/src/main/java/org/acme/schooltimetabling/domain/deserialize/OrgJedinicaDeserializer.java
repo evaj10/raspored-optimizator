@@ -10,9 +10,13 @@ import org.acme.schooltimetabling.domain.Katedra;
 import org.acme.schooltimetabling.domain.OrganizacionaJedinica;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class OrgJedinicaDeserializer extends StdDeserializer<OrganizacionaJedinica> {
+
+    private final Map<UUID, Departman> departmanMap;
 
     public OrgJedinicaDeserializer() {
         this(null);
@@ -20,8 +24,8 @@ public class OrgJedinicaDeserializer extends StdDeserializer<OrganizacionaJedini
 
     public OrgJedinicaDeserializer(Class<?> vc) {
         super(vc);
+        this.departmanMap = new HashMap<>();
     }
-
 
     @Override
     public OrganizacionaJedinica deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
@@ -31,14 +35,22 @@ public class OrgJedinicaDeserializer extends StdDeserializer<OrganizacionaJedini
         String ssluzbaOznaka = node.get("ssluzbaOznaka").asText();
         String naziv = node.get("naziv").asText();
         if (node.get("departman").isNull()) {
-            return new Departman(id, oznaka, ssluzbaOznaka, naziv);
+            Departman departman = new Departman(id, oznaka, ssluzbaOznaka, naziv);
+            departmanMap.put(departman.getId(), departman);
+            return departman;
         }
         JsonNode departmanNode = node.get("departman");
         UUID departmanId = UUID.fromString(departmanNode.get("id").asText());
-        String departmanOznaka = departmanNode.get("oznaka").asText();
-        String departmanSsluzbaOznaka = departmanNode.get("ssluzbaOznaka").asText();
-        String departmanNaziv = departmanNode.get("naziv").asText();
-        Departman departman = new Departman(departmanId, departmanOznaka, departmanSsluzbaOznaka, departmanNaziv);
-        return new Katedra(id, oznaka, ssluzbaOznaka, naziv, departman);
+        Departman departman = departmanMap.get(departmanId);
+        if (departman == null) {
+            String departmanOznaka = departmanNode.get("oznaka").asText();
+            String departmanSsluzbaOznaka = departmanNode.get("ssluzbaOznaka").asText();
+            String departmanNaziv = departmanNode.get("naziv").asText();
+            departman = new Departman(departmanId, departmanOznaka, departmanSsluzbaOznaka, departmanNaziv);
+            departmanMap.put(departman.getId(), departman);
+        }
+        Katedra katedra = new Katedra(id, oznaka, ssluzbaOznaka, naziv, departman);
+        departman.addKatedra(katedra);
+        return katedra;
     }
 }
