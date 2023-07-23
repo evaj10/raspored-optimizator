@@ -34,12 +34,12 @@ public class OrgJedinicaDeserializer extends StdDeserializer<OrganizacionaJedini
         String oznaka = node.get("oznaka").asText();
         String ssluzbaOznaka = node.get("ssluzbaOznaka").asText();
         String naziv = node.get("naziv").asText();
-        if (node.get("departman").isNull()) {
+        JsonNode departmanNode = node.get("departman");
+        if (departmanNode == null || departmanNode.isNull()) {
             Departman departman = new Departman(id, oznaka, ssluzbaOznaka, naziv);
             departmanMap.put(departman.getId(), departman);
             return departman;
         }
-        JsonNode departmanNode = node.get("departman");
         UUID departmanId = UUID.fromString(departmanNode.get("id").asText());
         Departman departman = departmanMap.get(departmanId);
         if (departman == null) {

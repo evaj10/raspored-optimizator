@@ -4,7 +4,9 @@ import org.acme.schooltimetabling.domain.*;
 import org.acme.schooltimetabling.solver.TimeTableState;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,11 @@ public class TimeTableSpringBootApp {
     @Bean
     public TimeTableState state() {
         return new TimeTableState();
+    }
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
     }
 
 //    @Bean
