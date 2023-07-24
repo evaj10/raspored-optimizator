@@ -26,7 +26,7 @@
     <localSearch>
         <termination>
 <!--            <unimprovedSpentLimit>PT2M30S</unimprovedSpentLimit>-->
-            <unimprovedSpentLimit>PT1H</unimprovedSpentLimit>
+            <unimprovedSpentLimit>PT3H</unimprovedSpentLimit>
         </termination>
         <localSearchType>LATE_ACCEPTANCE</localSearchType>
 <!--        <localSearchType>TABU_SEARCH</localSearchType>-->
