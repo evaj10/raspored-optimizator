@@ -37,6 +37,8 @@ public class Meeting implements Comparable<Meeting> {
 
     private List<StudentskaGrupa> studentskeGrupe;
 
+    private int requiredCapacity;
+
     public Meeting(UUID id, TipProstorije tipProstorije, MeetingType meetingTip, int brojCasova, Predavac predavac,
                    List<Predavac> ostaliPredavaci, Predmet predmet, List<StudentskaGrupa> studentskeGrupe,
                    boolean biWeekly) {
@@ -91,11 +93,17 @@ public class Meeting implements Comparable<Meeting> {
 
 
     public int getRequiredCapacity() {
-        int total = studentskeGrupe.stream().mapToInt(StudentskaGrupa::getBrojStudenata).sum();
+        return this.requiredCapacity;
+    }
+
+    public void setStudentskeGrupe(List<StudentskaGrupa> studentskeGrupe) {
+        this.studentskeGrupe = studentskeGrupe;
+        int total = this.studentskeGrupe.stream().mapToInt(StudentskaGrupa::getBrojStudenata).sum();
         if (biWeekly) {
-            return total / 2;
+            this.requiredCapacity = total / 2;
+        } else {
+            this.requiredCapacity = total;
         }
-        return total;
     }
 
     public String getDurationString() {
