@@ -11,7 +11,7 @@ public class TimeTableState {
     @Autowired
     private NotificationService notificationService;
 
-    public static final Long MEETING_SCHEDULE_ID = 1L;
+    public static Long MEETING_SCHEDULE_ID = 0L;
 
     private MeetingSchedule state;
 
@@ -24,9 +24,9 @@ public class TimeTableState {
     public void setTimeTableState(MeetingSchedule state) {
         // called when meeting schedule created and when solving ends
         // -> can send email or emit event to front-end
-        if (this.state != null) {
+        if (this.state != null && this.state.getId().equals(state.getId())) {
             System.out.println("Sending notification that solving is finished");
-            notificationService.sendNotification(this.state.getMeetingAssignmentList());
+            notificationService.sendNotification(state.getMeetingAssignmentList());
             log.info("Final best score: {}", state.getScore());
         }
         this.state = state;

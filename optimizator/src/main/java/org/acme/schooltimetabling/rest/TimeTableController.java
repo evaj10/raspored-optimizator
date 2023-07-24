@@ -36,7 +36,7 @@ public class TimeTableController {
         meetingAssignment.setStartingTimeGrain(ms.getTimeGrainList().get(0));
         meetingAssignment.setProstorija(ms.getProstorijaList().get(0));
 
-        ms.setId(TimeTableState.MEETING_SCHEDULE_ID);
+        ms.setId(++TimeTableState.MEETING_SCHEDULE_ID);
         state.setTimeTableState(ms);
     }
 
