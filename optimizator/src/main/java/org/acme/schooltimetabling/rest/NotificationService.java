@@ -20,9 +20,13 @@ public class NotificationService {
     private String url;
 
     public void sendNotification(List<MeetingAssignment> meetingAssignments) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<List<MeetingAssignment>> entity = new HttpEntity<>(meetingAssignments, headers);
-        this.restTemplate.postForLocation(url, entity);
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<List<MeetingAssignment>> entity = new HttpEntity<>(meetingAssignments, headers);
+            this.restTemplate.postForLocation(url, entity);
+        } catch (Exception e) {
+            System.out.println("Following exception occurred: " + e);
+        }
     }
 }
